@@ -11,6 +11,8 @@ BGCOLOR = (75,60,100)
 WHITE = (255,255,255)
 RED = (255,0,0)
 GREEN = (0,255,0)
+BLACK = (0,0,0)
+WHITE_2 = (254, 254, 254)
 
 #player settings
 PLAYER_SPEED = 300
