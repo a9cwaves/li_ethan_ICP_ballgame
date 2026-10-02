@@ -43,13 +43,13 @@ class Game: #initialize class Game
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
 
-        for row, tiles in enumerate(self.map.data):
-            for col, tile, in enumerate(tiles):
-                if tile == '1':
-                    Wall(self,col,row)
-                if tile == 'M':
-                    pass
-        for row, tiles in enumerate(self.map.data):
+        for row, tiles in enumerate(self.map.data): #look into level 1 text
+            for col, tile, in enumerate(tiles): #check each of the tiles
+                if tile == '1': # wall variable
+                    Wall(self,col,row) #instantiate at that point
+                if tile == 'M': #mob
+                    Mob(self,col,row)
+        for row, tiles in enumerate(self.map.data): #same thing but for player
             for col, tile, in enumerate(tiles):
                 if tile == 'P':
                     Player(self,col,row)

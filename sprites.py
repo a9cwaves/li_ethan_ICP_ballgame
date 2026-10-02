@@ -79,23 +79,24 @@ class Player(Sprite):
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
-        if now - self.last_update > 350:
-            self.last_update = now
-            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
-            bottom = self.rect.bottom
-            self.image = self.idle_frames[self.current_frame]
+        if now - self.last_update > 500: #if the difference of the current frame and last frame > than 500 ms
+            self.last_update = now #make the last frame the current frame
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames) #updates to next frame
+            bottom = self.rect.bottom 
+            self.image = self.idle_frames[self.current_frame] #updates on to image
             self.rect = self.image.get_rect()
             self.rect.bottom = bottom
     def load_images(self):
+        #coordinates for the spritesheet, 2 ide frames
         self.idle_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
                             self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
-        self.run_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
-                            self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
+        # self.run_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
+        #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
         
     
     def update(self):
         self.get_keys() #senses when keys are pressed
-        self.animate()
+        self.animate() #calls the function
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
@@ -124,8 +125,11 @@ class Mob(Sprite):
         self.groups = game.all_sprites, game.all_mobs
         Sprite.__init__(self, self.groups)
         self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png")) #connects the image to spritesheet
+        self.load_images()
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(RED)
+        self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE)
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.speed = 1
         self.vx, self.vy = 500,0
@@ -133,9 +137,32 @@ class Mob(Sprite):
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
-        print("mob initialized")
+        #animation stuff
+        self.last_update = 0
+        self.current_frame = 0
+
+    
+    #copied animation from player
+    def animate(self):
+            # use the time element to get now
+            now = pg.time.get_ticks()
+            if now - self.last_update > 500: #if the difference of the current frame and last frame > than 500 ms
+                self.last_update = now #make the last frame the current frame
+                self.current_frame = (self.current_frame + 1) % len(self.idle_frames) #updates to next frame
+                bottom = self.rect.bottom 
+                self.image = self.idle_frames[self.current_frame] #updates on to image
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+    def load_images(self):
+        #2 ide frames for mob
+        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE,TILESIZE, TILESIZE),
+                            self.spritesheet.get_image(TILESIZE,TILESIZE,TILESIZE, TILESIZE)]
+        # self.run_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
+        #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
+
 
     def update(self):
+        self.animate()
         if self.rect.right > WIDTH or self.rect.x < 0:
             self.speed *= -1
             self.y += TILESIZE
