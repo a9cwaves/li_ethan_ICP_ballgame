@@ -52,7 +52,7 @@ class Game: #initialize class Game
         for row, tiles in enumerate(self.map.data): #same thing but for player
             for col, tile, in enumerate(tiles):
                 if tile == 'P':
-                    Player(self,col,row)
+                    self.player = Player(self,col,row)
 
     def run(self):
         self.playing = True
@@ -79,7 +79,7 @@ class Game: #initialize class Game
 
     def update(self):
         self.all_sprites.update()
-        #respawns the mob once there are not mobs left
+        #respawns the mob once there are no mobs left
         # if len(self.all_mobs) < 1:
         #     print("no more mobs")
         #     self.mob = Mob(self,0,0)

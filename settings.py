@@ -17,3 +17,6 @@ BLUE = (0,0,255)
 #player settings
 PLAYER_SPEED = 300
 PLAYER_HIT_RECT = pg.Rect(0,0,TILESIZE-5, TILESIZE-5)
+
+# mob settings
+MOB_HIT_RECT = pg.Rect(0,0, TILESIZE-5, TILESIZE-5)

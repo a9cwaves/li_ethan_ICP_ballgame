@@ -111,14 +111,16 @@ class Wall(Sprite):
         self.groups = game.all_sprites, game.all_walls
         Sprite.__init__(self, self.groups)
         self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        self.image = self.spritesheet.get_image(0,TILESIZE*2,TILESIZE,TILESIZE)
         self.rect = self.image.get_rect()
         self.x = x*TILESIZE
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
-        # print("wall initialized")
+
+
 
 class Mob(Sprite):
     def __init__(self, game, x, y):
@@ -131,12 +133,15 @@ class Mob(Sprite):
         self.image = self.spritesheet.get_image(0,0,TILESIZE,TILESIZE)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.speed = 1
-        self.vx, self.vy = 500,0
+        self.speed = 100
+        self.vel = vec(0,0)
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.x = x*TILESIZE
         self.y = y*TILESIZE
+        self.dir = "none"
         self.rect.x = self.x
         self.rect.y = self.y
+        self.hit_rect = MOB_HIT_RECT
         #animation stuff
         self.last_update = 0
         self.current_frame = 0
@@ -160,13 +165,31 @@ class Mob(Sprite):
         # self.run_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
 
+    def chase(self, obj):
+        if self.pos.x < obj.pos.x:
+            self.vel.x = self.speed
+            self.dir = "right"
+        elif self.pos.x > obj.pos.x:
+            self.vel.x = -self.speed
+            self.dir = "left"
+        else:
+            self.vel.x = 0
+
+        if self.pos.y < obj.pos.y:
+            self.vel.y = self.speed
+        elif self.pos.y > obj.pos.y:
+            self.vel.y = -self.speed
+        else:
+            self.vel.y = 0
 
     def update(self):
         self.animate()
-        if self.rect.right > WIDTH or self.rect.x < 0:
-            self.speed *= -1
-            self.y += TILESIZE
-        self.x += self.vx * self.game.dt * self.speed
-        self.rect.x = self.x
-        self.y += self.vy * self.game.dt * self.speed
-        self.rect.y = self.y
+        if self.game.player:
+            self.chase(self.game.player)
+        self.rect.center = self.pos
+        self.pos += self.vel * self.game.dt
+        self.hit_rect.centerx = self.pos.x
+        collide_with_walls(self, self.game.all_walls, 'x')
+        self.hit_rect.centery = self.pos.y
+        collide_with_walls(self, self.game.all_walls, 'y')
+        self.rect.center = self.hit_rect.center
