@@ -58,6 +58,7 @@ class Player(Sprite):
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
+        self.coins = 0
         #animation stuff
         self.last_update = 0
         self.current_frame = 0
@@ -84,6 +85,7 @@ class Player(Sprite):
             self.current_frame = (self.current_frame + 1) % len(self.idle_frames) #updates to next frame
             bottom = self.rect.bottom 
             self.image = self.idle_frames[self.current_frame] #updates on to image
+            self.image.set_colorkey(BLACK)
             self.rect = self.image.get_rect()
             self.rect.bottom = bottom
     def load_images(self):
@@ -93,9 +95,11 @@ class Player(Sprite):
         # self.run_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
         
-    
     def update(self):
         self.get_keys() #senses when keys are pressed
+        hits = pg.sprite.spritecollide(self,self.game.all_coins, True)
+        if hits:
+            self.coins  += 1
         self.animate() #calls the function
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -156,6 +160,7 @@ class Mob(Sprite):
                 self.current_frame = (self.current_frame + 1) % len(self.idle_frames) #updates to next frame
                 bottom = self.rect.bottom 
                 self.image = self.idle_frames[self.current_frame] #updates on to image
+                self.image.set_colorkey(BLACK)
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
     def load_images(self):
@@ -165,6 +170,7 @@ class Mob(Sprite):
         # self.run_frames = [self.spritesheet.get_image(0,0,TILESIZE, TILESIZE),
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
 
+    #uses autocomplete by creating a hcase method using pos vectors and obj as a parameter
     def chase(self, obj):
         if self.pos.x < obj.pos.x:
             self.vel.x = self.speed
@@ -184,8 +190,7 @@ class Mob(Sprite):
 
     def update(self):
         self.animate()
-        if self.game.player:
-            self.chase(self.game.player)
+        self.chase(self.game.player)
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
@@ -193,3 +198,20 @@ class Mob(Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, 'y')
         self.rect.center = self.hit_rect.center
+
+class Coin(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_coins
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE,TILESIZE)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.x = x*TILESIZE
+        self.y = y*TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+    def update(self):
+        pass

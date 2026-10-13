@@ -17,6 +17,12 @@ aim in fps
 
 Output: graphics - things are drawn, sound: jump, power up, footsteps, haptics,
 
+GOALS:
+
+RULES:
+
+FEEDBACK:
+
 '''
 
 class Game: #initialize class Game
@@ -42,6 +48,7 @@ class Game: #initialize class Game
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
+        self.all_coins = pg.sprite.Group()
 
         for row, tiles in enumerate(self.map.data): #look into level 1 text
             for col, tile, in enumerate(tiles): #check each of the tiles
@@ -49,6 +56,8 @@ class Game: #initialize class Game
                     Wall(self,col,row) #instantiate at that point
                 if tile == 'M': #mob
                     Mob(self,col,row)
+                if tile == 'C': #coin
+                    Coin(self,col,row)
         for row, tiles in enumerate(self.map.data): #same thing but for player
             for col, tile, in enumerate(tiles):
                 if tile == 'P':
