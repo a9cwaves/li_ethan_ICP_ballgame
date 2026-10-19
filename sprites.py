@@ -100,6 +100,7 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self,self.game.all_coins, True)
         if hits:
             self.coins  += 1
+            self.game.pickup_snd.play()
         self.animate() #calls the function
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt
@@ -213,5 +214,22 @@ class Coin(Sprite):
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+    def update(self):
+        pass
+
+class PowerUp(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_powerups
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(0,TILESIZE*3,TILESIZE,TILESIZE)
+            self.image.set_colorkey(BLACK)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
     def update(self):
         pass

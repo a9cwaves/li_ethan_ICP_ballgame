@@ -39,7 +39,9 @@ class Game: #initialize class Game
     def load_data(self,map):
         self.game_dir = path.dirname(__file__)
         self.image_dir = path.join(self.game_dir,'images')
+        #sound handling
         self.snd_dir = path.join(self.game_dir,'audio')
+        self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "pickup.mp3"))
         self.map = Map(path.join(self.game_dir, map))
 
     def new(self):
@@ -49,6 +51,7 @@ class Game: #initialize class Game
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
         self.all_coins = pg.sprite.Group()
+        self.all_powerups = pg.sprite.Group()
 
         for row, tiles in enumerate(self.map.data): #look into level 1 text
             for col, tile, in enumerate(tiles): #check each of the tiles
@@ -58,6 +61,8 @@ class Game: #initialize class Game
                     Mob(self,col,row)
                 if tile == 'C': #coin
                     Coin(self,col,row)
+                if tile == 'S': #powerup
+                    PowerUp(self,col,row)
         for row, tiles in enumerate(self.map.data): #same thing but for player
             for col, tile, in enumerate(tiles):
                 if tile == 'P':
