@@ -48,15 +48,15 @@ class Game: #initialize class Game
         self.map = Map(path.join(self.game_dir, map))
 
         try:
-            with open(self.game_Save_file, 'x', encoding="utf-8") as file:
+            with open(self.game_Save_file, 'x', encoding="utf-8") as file: #creates new save fle
                 file.write("hello world")
-            print("file created successfully")
-        except FileExistsError:
+            print("file created successfully") #test
+        except FileExistsError: #if it already exists, prevents error from stopping program
             print("File already exists")
 
-        with open(self.game_Save_file, 'r') as file:
+        with open(self.game_Save_file, 'r') as file: #opens save file to read
             try:
-                self.high_score = int(file.read())
+                self.high_score = int(file.read()) #type casting, converts file content to integer
             except:
                 # self.high_score = 0
                 print("high score not read")
@@ -95,9 +95,9 @@ class Game: #initialize class Game
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT: #changes self.running to false, quitting the game when closing window
-                if self.score > self.high_score:
-                    with open(path.join(self.game_dir, self.game_Save_file), 'w') as f:
-                        f.write(str(self.score))
+                if self.score > self.high_score: #makes sure it doesn't reset to a lower high score
+                    with open(path.join(self.game_dir, self.game_Save_file), 'w') as f: #creates the new file, writes in it
+                        f.write(str(self.score)) #writes score in to the highscore file
                 if self.playing:
                     self.playing = False
                 self.running = False
