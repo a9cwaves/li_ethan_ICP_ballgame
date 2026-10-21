@@ -35,18 +35,34 @@ class Game: #initialize class Game
         self.running = True
         self.playing = True
         self.clock = pg.time.Clock()
+        self.high_score = 0
+        self.score = 0
 
     def load_data(self,map):
         self.game_dir = path.dirname(__file__)
+        self.game_Save_file = path.join(self.game_dir, "highscore.txt")
         self.image_dir = path.join(self.game_dir,'images')
         #sound handling
         self.snd_dir = path.join(self.game_dir,'audio')
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "pickup.mp3"))
         self.map = Map(path.join(self.game_dir, map))
 
+        try:
+            with open(self.game_Save_file, 'x', encoding="utf-8") as file:
+                file.write("hello world")
+            print("file created successfully")
+        except FileExistsError:
+            print("File already exists")
+
+        with open(self.game_Save_file, 'r') as file:
+            try:
+                self.high_score = int(file.read())
+            except:
+                # self.high_score = 0
+                print("high score not read")
+
     def new(self):
         self.load_data('level1.txt')
-        print(self.map.data)
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
@@ -79,9 +95,12 @@ class Game: #initialize class Game
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT: #changes self.running to false, quitting the game when closing window
+                if self.score > self.high_score:
+                    with open(path.join(self.game_dir, self.game_Save_file), 'w') as f:
+                        f.write(str(self.score))
                 if self.playing:
                     self.playing = False
-                self.running = False  
+                self.running = False
 
     def draw_text(self,text,size,color,x,y):
         font_name = pg.font.match_font('arial') #assigns arial font to font_name
@@ -103,7 +122,10 @@ class Game: #initialize class Game
         #the last lines in this method are drawn on top or last
         self.screen.fill(BGCOLOR) #background color
         self.all_sprites.draw(self.screen) #all sprites drawn on screen
-        self.draw_text("Frames per second: " + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text(f"Frames per second: " + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
+        self.draw_text(f"Coins: " + str(self.player.coins), 24, WHITE, WIDTH/2, HEIGHT/7 + 10)
+        self.draw_text(f"Score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/4 + 40)
+        self.draw_text(f"High Score: " + str(self.high_score), 24, WHITE, WIDTH/2, HEIGHT/12)
         pg.display.flip()
 
 if __name__ == "__main__":
