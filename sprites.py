@@ -3,6 +3,8 @@ from pygame.sprite import Sprite
 from settings import *
 from utils import *
 
+from random import randint
+
 from os import path
 
 vec = pg.math.Vector2
@@ -99,6 +101,8 @@ class Player(Sprite):
         self.get_keys() #senses when keys are pressed
         hits = pg.sprite.spritecollide(self,self.game.all_coins, True)
         if hits:
+            for i in range(10):
+                Particle(self.game, hits[0].pos.x, hits[0].pos.y) #generates particles once coin is hit
             self.coins  += 1
             self.game.pickup_snd.play()
             self.game.score += 1
@@ -126,6 +130,33 @@ class Wall(Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
+class Particle(Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.all_particles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x
+        self.y = y
+        self.speed = 25
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.countdown = Cooldown(5000)
+        self.countdown.event_time = floor(pg.time.get_ticks()/1000) #countdown starts as soon as it is created
+        print(self.rect.x)
+        print(self.rect.y)
+        print(str(len(self.game.all_particles)))
+        
+    def update(self):
+        self.countdown.ticking() #once generated, starts ticking
+        self.rect.x += self.speed*randint(-5,5) #randomizes direction of where particles shoot to
+        self.rect.y += self.speed*randint(-5,5)
+        # if it is on for more than 3 s, then it disappears
+        if self.countdown.delta > 2: 
+            self.kill()
 
 
 class Mob(Sprite):
@@ -211,10 +242,11 @@ class Coin(Sprite):
         self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE,TILESIZE)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.x = x*TILESIZE
-        self.y = y*TILESIZE
-        self.rect.x = self.x
-        self.rect.y = self.y
+        # self.x = x*TILESIZE
+        # self.y = y*TILESIZE
+        self.pos = vec(x*TILESIZE,y*TILESIZE)
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
     def update(self):
         pass
 

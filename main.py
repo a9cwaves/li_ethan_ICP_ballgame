@@ -68,6 +68,7 @@ class Game: #initialize class Game
         self.all_mobs = pg.sprite.Group()
         self.all_coins = pg.sprite.Group()
         self.all_powerups = pg.sprite.Group()
+        self.all_particles = pg.sprite.Group()
 
         for row, tiles in enumerate(self.map.data): #look into level 1 text
             for col, tile, in enumerate(tiles): #check each of the tiles
