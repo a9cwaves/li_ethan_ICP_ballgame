@@ -108,11 +108,11 @@ class Player(Sprite):
             self.game.score += 1
         self.animate() #calls the function
         self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        self.pos += self.vel * self.game.dt # d = v * t
         self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls, 'x')
+        collide_with_walls(self, self.game.all_walls, 'x') # x axis collision test
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
+        collide_with_walls(self, self.game.all_walls, 'y') # y axis collision test
         self.rect.center = self.hit_rect.center
         
 
@@ -138,25 +138,25 @@ class Particle(Sprite):
         self.image = pg.Surface((TILESIZE/8, TILESIZE/8))
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-        self.vx, self.vy = 0,0
-        self.x = x
-        self.y = y
-        self.speed = 25
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.countdown = Cooldown(5000)
+        self.vel = vec(randint(-180,180),randint(-180,180)) #gives random velocity in x and y direction
+        self.pos = vec(x,y) #starting position
+        self.speed = randint(1,3) #random speed
+        self.countdown = Cooldown() #creates the cooldown object so we can use it
         self.countdown.event_time = floor(pg.time.get_ticks()/1000) #countdown starts as soon as it is created
-        print(self.rect.x)
-        print(self.rect.y)
-        print(str(len(self.game.all_particles)))
+        # print(self.rect.x)
+        # print(self.rect.y)
+        # print(str(len(self.game.all_particles)))
         
     def update(self):
         self.countdown.ticking() #once generated, starts ticking
-        self.rect.x += self.speed*randint(-5,5) #randomizes direction of where particles shoot to
-        self.rect.y += self.speed*randint(-5,5)
-        # if it is on for more than 3 s, then it disappears
+
+        self.pos += self.vel * self.speed * self.game.dt #updates the position, mutiples to calculate the movement
+        # countdowns for two seconds, then makes them disappears
         if self.countdown.delta > 2: 
             self.kill()
+        #updates particle position on screen
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
 
 
 class Mob(Sprite):
@@ -225,11 +225,11 @@ class Mob(Sprite):
         self.animate()
         self.chase(self.game.player)
         self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        self.pos += self.vel * self.game.dt #updates position by mutiplying time and velocity
         self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.all_walls, 'x')
+        collide_with_walls(self, self.game.all_walls, 'x') # x axis collision test
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y')
+        collide_with_walls(self, self.game.all_walls, 'y') # y axis collision test
         self.rect.center = self.hit_rect.center
 
 class Coin(Sprite):

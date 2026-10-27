@@ -20,24 +20,19 @@ class Spritesheet:
 
     def get_image(self,x,y,width,height):
         image = pg.Surface((width,height))
-        image.blit(self.spritesheet, (0,0), (x,y,width,height))
+        image.blit(self.spritesheet, (0,0), (x,y,width,height)) #extracts the specific image we want from spritesheet
         new_image = pg.transform.scale(image, (width,height))
         image = new_image
         return image
 
 class Cooldown:
-    def __init__(self, time):
-        self.start_time = 0
-        self.time = time
-        self.current_time = self.time
+    def __init__(self):
+        # at the start, all time is 0
+        self.event_time = 0
+        self.current_time = 0
+        self.delta = 0
     def ticking(self):
-        self.current_time = floor((pg.time.get_ticks())/1000)
-        self.delta = self.current_time - self.event_time
+        self.current_time = floor((pg.time.get_ticks())/1000) #converts ms to s, rounds to nearest whole #
+        self.delta = self.current_time - self.event_time #calculates the change in time after collision happened
     def start(self):
-        self.start_time = pg.time.get_ticks()
-    def ready(self):
-        self.current_time = pg.time.get_ticks()
-
-        if self.current_time - self.start_time >= self.time: #if it is ready (cooldown ends)
-            return True
-        return False
+        self.event_time = pg.time.get_ticks() #records time after cooldown starts
