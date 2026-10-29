@@ -59,26 +59,35 @@ class Player(Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
+        self.acc = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
         self.coins = 0
+        self.dir = "none"
+        self.jumping = False
         #animation stuff
         self.last_update = 0
         self.current_frame = 0
 
     def get_keys(self):
-        self.vel = vec(0,0)
+        # self.vel = vec(0,0)
         keys = pg.key.get_pressed() #boolean value returned if keyboard pressed
         if keys[pg.K_LEFT] or keys[pg.K_a]: #if these keys are pressed
-            self.vel.x = -PLAYER_SPEED
+            self.acc.x = -PLAYER_SPEED
+            # self.vel.x = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vel.x = PLAYER_SPEED
+            self.acc.x = PLAYER_SPEED
+            # self.vel.x = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
-            self.vel.y = -PLAYER_SPEED
+            self.acc.y = -PLAYER_SPEED
+            # self.vel.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vel.y = PLAYER_SPEED
+            self.acc.y = PLAYER_SPEED
+            # self.vel.y = PLAYER_SPEED
         #check to see if player is moving diagonal
-        if self.vel.x != 0 and self.vel.y != 0:
-            self.vel *= 0.7071
+        # if self.vel.x != 0 and self.vel.y != 0:
+        #     self.vel *= 0.7071
+    def jump(self):
+        pass
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
@@ -98,16 +107,21 @@ class Player(Sprite):
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
         
     def update(self):
+        self.acc = vec(0,1) #gravity
         self.get_keys() #senses when keys are pressed
+        self.acc.x += self.vel.x * PLAYER_FRIC
+        self.acc.y += self.vel.y * PLAYER_FRIC
+        self.vel += self.acc
+        self.rect.center = self.pos
+        self.pos += self.vel + 0.5*self.acc #short kinematics equation in physics
         hits = pg.sprite.spritecollide(self,self.game.all_coins, True)
         if hits:
-            for i in range(10):
+            for i in range(20): # number of particles that are created
                 Particle(self.game, hits[0].pos.x, hits[0].pos.y) #generates particles once coin is hit
             self.coins  += 1
-            self.game.pickup_snd.play()
+            self.game.pickup_snd.play() #plays sound
             self.game.score += 1
         self.animate() #calls the function
-        self.rect.center = self.pos
         self.pos += self.vel * self.game.dt # d = v * t
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x') # x axis collision test
@@ -141,18 +155,18 @@ class Particle(Sprite):
         self.vel = vec(randint(-180,180),randint(-180,180)) #gives random velocity in x and y direction
         self.pos = vec(x,y) #starting position
         self.speed = randint(1,3) #random speed
-        self.countdown = Cooldown() #creates the cooldown object so we can use it
+        self.countdown = Timer() #creates the timer object so we can use it
         self.countdown.event_time = floor(pg.time.get_ticks()/1000) #countdown starts as soon as it is created
         # print(self.rect.x)
         # print(self.rect.y)
         # print(str(len(self.game.all_particles)))
         
     def update(self):
-        self.countdown.ticking() #once generated, starts ticking
+        # self.countdown.ticking() #once generated, starts ticking
 
         self.pos += self.vel * self.speed * self.game.dt #updates the position, mutiples to calculate the movement
         # countdowns for two seconds, then makes them disappears
-        if self.countdown.delta > 2: 
+        if self.countdown.get_delta() > 2: 
             self.kill()
         #updates particle position on screen
         self.rect.x = self.pos.x

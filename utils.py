@@ -25,14 +25,11 @@ class Spritesheet:
         image = new_image
         return image
 
-class Cooldown:
+class Timer:
     def __init__(self):
-        # at the start, all time is 0
-        self.event_time = 0
-        self.current_time = 0
-        self.delta = 0
-    def ticking(self):
-        self.current_time = floor((pg.time.get_ticks())/1000) #converts ms to s, rounds to nearest whole #
-        self.delta = self.current_time - self.event_time #calculates the change in time after collision happened
-    def start(self):
-        self.event_time = pg.time.get_ticks() #records time after cooldown starts
+        #converts ms to s, rounds to nearest whole #
+        self.event_time = floor((pg.time.get_ticks())/1000)
+    def get_delta(self):
+        #returns difference in time (s) from time of instantiation to now
+        return floor((pg.time.get_ticks())/1000) - self.event_time
+        
