@@ -84,10 +84,23 @@ class Player(Sprite):
             self.acc.y = PLAYER_SPEED
             # self.vel.y = PLAYER_SPEED
         #check to see if player is moving diagonal
-        # if self.vel.x != 0 and self.vel.y != 0:
-        #     self.vel *= 0.7071
+        if self.vel.x != 0 and self.vel.y != 0:
+            self.vel *= 0.7071
+        if keys[pg.K_SPACE]:
+            self.jump()
     def jump(self):
-        pass
+        self.rect.y += 2 #move down slightly to check for walls below
+        hits = pg.sprite.spritecollide(self, self.game.all_walls, False) #collision check
+        self.rect.y -= 2 #go back to original positoin
+        if hits and not self.jumping: #only if on wall and not jumping
+            # self.game.jump_sound.play()
+            self.jumping = True
+            self.vel.y = -PLAYER_JUMP #the jump
+    def is_jumping(self):
+        if self.vel.y > 0: #if falling
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False) #collision check
+            if hits:
+                self.jumping = False #allow the player to jump again
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
@@ -107,12 +120,13 @@ class Player(Sprite):
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
         
     def update(self):
-        self.acc = vec(0,1) #gravity
+        self.acc = vec(0,PLAYER_GRAV) #gravity
+        self.is_jumping()
         self.get_keys() #senses when keys are pressed
         self.acc.x += self.vel.x * PLAYER_FRIC
         self.acc.y += self.vel.y * PLAYER_FRIC
         self.vel += self.acc
-        self.rect.center = self.pos
+        # self.rect.center = self.pos
         self.pos += self.vel + 0.5*self.acc #short kinematics equation in physics
         hits = pg.sprite.spritecollide(self,self.game.all_coins, True)
         if hits:
@@ -122,11 +136,12 @@ class Player(Sprite):
             self.game.pickup_snd.play() #plays sound
             self.game.score += 1
         self.animate() #calls the function
-        self.pos += self.vel * self.game.dt # d = v * t
+        # self.pos += self.vel * self.game.dt # d = v * t
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x') # x axis collision test
         self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.all_walls, 'y') # y axis collision test
+        if collide_with_walls(self, self.game.all_walls, 'y'): # y axis collision test
+            self.jumping = False #reset jumping status after landing
         self.rect.center = self.hit_rect.center
         
 
