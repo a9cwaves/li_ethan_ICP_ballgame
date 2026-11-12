@@ -77,9 +77,9 @@ class Player(Sprite):
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.acc.x = PLAYER_SPEED
             # self.vel.x = PLAYER_SPEED
-        if keys[pg.K_UP] or keys[pg.K_w]:
-            self.acc.y = -PLAYER_SPEED
-            # self.vel.y = -PLAYER_SPEED
+        # if keys[pg.K_UP] or keys[pg.K_w]:
+        #     self.acc.y = -PLAYER_SPEED
+        #     # self.vel.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_SPEED
             # self.vel.y = PLAYER_SPEED
@@ -88,6 +88,7 @@ class Player(Sprite):
             self.vel *= 0.7071
         if keys[pg.K_SPACE]:
             self.jump()
+
     def jump(self):
         self.rect.y += 2 #move down slightly to check for walls below
         hits = pg.sprite.spritecollide(self, self.game.all_walls, False) #collision check
@@ -95,12 +96,13 @@ class Player(Sprite):
         if hits and not self.jumping: #only if on wall and not jumping
             # self.game.jump_sound.play()
             self.jumping = True
-            self.vel.y = -PLAYER_JUMP #the jump
+            self.vel.y = -PLAYER_JUMP
     def is_jumping(self):
         if self.vel.y > 0: #if falling
-            hits = pg.sprite.spritecollide(self, self.game.all_walls, False) #collision check
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             if hits:
                 self.jumping = False #allow the player to jump again
+
     def animate(self):
         # use the time element to get now
         now = pg.time.get_ticks()
@@ -120,12 +122,16 @@ class Player(Sprite):
         #                     self.spritesheet.get_image(TILESIZE,0,TILESIZE, TILESIZE)]
         
     def update(self):
-        self.acc = vec(0,PLAYER_GRAV) #gravity
         self.is_jumping()
+        self.acc = vec(0,PLAYER_GRAV) #gravity
         self.get_keys() #senses when keys are pressed
         self.acc.x += self.vel.x * PLAYER_FRIC
         self.acc.y += self.vel.y * PLAYER_FRIC
         self.vel += self.acc
+        if abs(self.vel.x) <0.1:
+            self.vel.x=0
+        if abs(self.vel.y) <0.1:
+            self.vel.y=0
         # self.rect.center = self.pos
         self.pos += self.vel + 0.5*self.acc #short kinematics equation in physics
         hits = pg.sprite.spritecollide(self,self.game.all_coins, True)
@@ -135,6 +141,9 @@ class Player(Sprite):
             self.coins  += 1
             self.game.pickup_snd.play() #plays sound
             self.game.score += 1
+        # pu_hits = pg.sprite.spritecollide(self,self.game.all_powerups, True)
+        # if pu_hits:
+        #     self.acc(5,PLAYER_GRAV)
         self.animate() #calls the function
         # self.pos += self.vel * self.game.dt # d = v * t
         self.hit_rect.centerx = self.pos.x
@@ -289,9 +298,10 @@ class PowerUp(Sprite):
             self.image = self.spritesheet.get_image(0,TILESIZE*3,TILESIZE,TILESIZE)
             self.image.set_colorkey(BLACK)
             self.rect = self.image.get_rect()
-            self.x = x*TILESIZE
-            self.y = y*TILESIZE
-            self.rect.x = self.x
-            self.rect.y = self.y
+            # self.x = x*TILESIZE
+            # self.y = y*TILESIZE
+            self.pos = vec(x*TILESIZE,y*TILESIZE)
+            self.rect.x = self.pos.x
+            self.rect.y = self.pos.y
     def update(self):
         pass
