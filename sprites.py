@@ -77,9 +77,9 @@ class Player(Sprite):
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.acc.x = PLAYER_SPEED
             # self.vel.x = PLAYER_SPEED
-        # if keys[pg.K_UP] or keys[pg.K_w]:
-        #     self.acc.y = -PLAYER_SPEED
-        #     # self.vel.y = -PLAYER_SPEED
+        if keys[pg.K_UP] or keys[pg.K_w]:
+            self.acc.y = -PLAYER_SPEED
+            # self.vel.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_SPEED
             # self.vel.y = PLAYER_SPEED
@@ -123,7 +123,7 @@ class Player(Sprite):
         
     def update(self):
         self.is_jumping()
-        self.acc = vec(0,PLAYER_GRAV) #gravity
+        self.acc = vec(0,0) #gravity
         self.get_keys() #senses when keys are pressed
         self.acc.x += self.vel.x * PLAYER_FRIC
         self.acc.y += self.vel.y * PLAYER_FRIC

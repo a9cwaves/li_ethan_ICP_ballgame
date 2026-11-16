@@ -63,6 +63,7 @@ class Game: #initialize class Game
 
     def new(self):
         self.load_data('level1.txt')
+        self.camera = Camera(self.map.width, self.map.height)
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
@@ -113,6 +114,7 @@ class Game: #initialize class Game
 
     def update(self):
         self.all_sprites.update()
+        self.camera.update(self.player) #make it stay centered on the player
         #respawns the mob once there are no mobs left
         # if len(self.all_mobs) < 1:
         #     print("no more mobs")
@@ -122,7 +124,8 @@ class Game: #initialize class Game
         #order matters: first things are on the bottom because they are the first to be drawn
         #the last lines in this method are drawn on top or last
         self.screen.fill(BGCOLOR) #background color
-        self.all_sprites.draw(self.screen) #all sprites drawn on screen
+        for sprite in self.all_sprites: 
+            self.screen.blit(sprite.image, self.camera.apply(sprite)) #draws each sprite in the screen based on camera (first parameter is image, second is position)
         self.draw_text(f"Frames per second: " + str(floor(1/self.dt)), 24, WHITE, WIDTH/2, HEIGHT/4)
         self.draw_text(f"Coins: " + str(self.player.coins), 24, WHITE, WIDTH/2, HEIGHT/7 + 10)
         self.draw_text(f"Score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/4 + 40)
