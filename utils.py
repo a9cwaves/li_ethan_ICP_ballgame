@@ -36,7 +36,8 @@ class Timer:
 class Camera:
     def __init__(self,width,height):
         self.camera = pg.Rect(0,0,width,height)
-
+        self.width = width
+        self.height = height
     def apply(self,sprite): #changes the pos of where the sprites get drawn on screen
         # take original position of sprite and add the camera offset to make sidescroller effect
         screen_x = sprite.rect.x + self.camera.x
@@ -48,6 +49,20 @@ class Camera:
         #this moves the camera so that the player will always be at the center of the screen
         x = -player.rect.centerx + WIDTH // 2
         y = -player.rect.centery + HEIGHT // 2
+
+        #check to stop camera from going over map
+        #left edge
+        if x > 0:
+            x = 0 #stop moving
+        #top 
+        if y > 0:
+            y = 0
+        #right edge
+        if x < WIDTH - self.width: #the furthest the camera can go
+            x = WIDTH - self.width 
+        #bottom
+        if y < HEIGHT - self.height: 
+            y = HEIGHT - self.height
 
         self.camera.topleft = (x, y)
 
