@@ -1,11 +1,13 @@
 import pygame as pg
 from settings import *
 from math import floor
+import os
 
 class Map:
     def __init__(self, filename):
         self.data = []
-        with open(filename, 'rt') as f:
+        #changed with the help of chatgpt because of an error with opening level1.txt
+        with open(os.path.join(os.path.dirname(__file__), filename), "rt") as f: 
             for line in f:
                 self.data.append(line.strip())
         self.tilewidth = len(self.data[0])
@@ -33,6 +35,7 @@ class Timer:
         #returns difference in time (s) from time of instantiation to now
         return floor((pg.time.get_ticks())/1000) - self.event_time
 
+#used chatgpt to help me choose the way scrolling would work and the starting point
 class Camera:
     def __init__(self,width,height):
         self.camera = pg.Rect(0,0,width,height)
@@ -43,13 +46,11 @@ class Camera:
         screen_x = sprite.rect.x + self.camera.x
         screen_y = sprite.rect.y + self.camera.y
         return screen_x, screen_y #final screen coords
-    
     def update(self,player):
         #subtracts the difference between the distance between the center of player to the side of screen in x & y
         #this moves the camera so that the player will always be at the center of the screen
         x = -player.rect.centerx + WIDTH // 2
         y = -player.rect.centery + HEIGHT // 2
-
         #check to stop camera from going over map
         #left edge
         if x > 0:
@@ -63,7 +64,6 @@ class Camera:
         #bottom
         if y < HEIGHT - self.height: 
             y = HEIGHT - self.height
-
         self.camera.topleft = (x, y)
 
 

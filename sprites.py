@@ -141,6 +141,13 @@ class Player(Sprite):
             self.coins  += 1
             self.game.pickup_snd.play() #plays sound
             self.game.score += 1
+        stair = pg.sprite.spritecollideany(self,self.game.all_stairs) #help with chatgpt
+        #if player is on a stair and a transition hasn't started
+        if stair and not self.game.transitioning: #prevents player from repeated switches when the player is still on stair
+            self.game.transitioning = True #transition started
+            self.game.change_level(stair.target_level) #switches to the other level
+        elif not stair: #no longer touching stair
+            self.game.transitioning = False #don't transition
         # pu_hits = pg.sprite.spritecollide(self,self.game.all_powerups, True)
         # if pu_hits:
         #     self.acc(5,PLAYER_GRAV)
@@ -148,7 +155,7 @@ class Player(Sprite):
         # self.pos += self.vel * self.game.dt # d = v * t
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, 'x') # x axis collision test
-        self.hit_rect.centery = self.pos.y
+        self.hit_rect.centery = self.pos.y 
         if collide_with_walls(self, self.game.all_walls, 'y'): # y axis collision test
             self.jumping = False #reset jumping status after landing
         self.rect.center = self.hit_rect.center
@@ -167,6 +174,89 @@ class Wall(Sprite):
         self.y = y*TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
+
+class Stair1(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_stairs1
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*3,TILESIZE,TILESIZE)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
+class Stair2(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_stairs2
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(0,TILESIZE*4,TILESIZE,TILESIZE)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
+
+class Stair0(Sprite): #the one on level 1 that goes to level 2
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_stairs
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.target_level = 2 #the level that once touched player will go to
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(0,TILESIZE*4,TILESIZE,TILESIZE)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
+class Stair9(Sprite): #the one on level 2 that goes to level 1
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_stairs
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.target_level = 1
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(0,TILESIZE*4,TILESIZE,TILESIZE)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
+
+class LBench(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_walls
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(0,TILESIZE*5,TILESIZE,TILESIZE)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
+class RBench(Sprite):
+    def __init__(self, game, x, y):
+            self.groups = game.all_sprites, game.all_walls
+            Sprite.__init__(self, self.groups)
+            self.game = game
+            self.spritesheet = Spritesheet(path.join(self.game.image_dir, "sprite_sheet.png"))
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.image = self.spritesheet.get_image(TILESIZE,TILESIZE*4,TILESIZE,TILESIZE)
+            self.rect = self.image.get_rect()
+            self.x = x*TILESIZE
+            self.y = y*TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
 
 class Particle(Sprite):
     def __init__(self, game, x, y):
